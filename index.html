@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quote Jump</title>
+    <script>
+      ;(() => {
+        const streamerKey = 'quote-jump-streamer'
+        const localeKey = 'quote-jump-locale'
+        const defaultStreamer = '牢A'
+        const appNameByLocale = {
+          en: 'Quote Jump',
+          zh: '言论索引',
+        }
+        const resolveLocale = (rawLocale) => {
+          if (!rawLocale) return 'en'
+          return String(rawLocale).toLowerCase().startsWith('zh') ? 'zh' : 'en'
+        }
+        try {
+          const streamer = localStorage.getItem(streamerKey) || defaultStreamer
+          const savedLocale = localStorage.getItem(localeKey)
+          const browserLocale = navigator.languages?.[0] || navigator.language || 'en'
+          const locale = resolveLocale(savedLocale || browserLocale)
+          const appName = appNameByLocale[locale] || appNameByLocale.en
+          document.title = `${streamer} ${appName}`
+        } catch {
+          document.title = `${defaultStreamer} ${appNameByLocale.en}`
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

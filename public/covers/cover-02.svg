@@ -1,0 +1,16 @@
+<svg width="640" height="360" viewBox="0 0 640 360" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="1" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5aa0ff" />
+      <stop offset="100%" stop-color="#2f6bff" />
+    </linearGradient>
+  </defs>
+  <rect width="640" height="360" fill="url(#grad)" />
+  <rect x="60" y="70" width="180" height="180" rx="24" fill="#d9e7ff" opacity="0.8" />
+  <text x="280" y="170" font-family="'Space Grotesk', sans-serif" font-size="36" fill="#f7f7ff">
+    Transcript Tools
+  </text>
+  <text x="280" y="210" font-family="'Space Grotesk', sans-serif" font-size="18" fill="#f7f7ff" opacity="0.8">
+    Episode 02
+  </text>
+</svg>
