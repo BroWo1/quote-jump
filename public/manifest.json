@@ -3,10 +3,26 @@
     {
       "bvid": "BV1CRkhBNExs",
       "author": "牢A",
-      "title": "Bilibili BV1CRkhBNExs",
+      "title": "和大佬连麦",
       "coverUrl": "/covers/cover-01.svg",
       "date": "",
       "transcript": "/transcripts/transcript_test.json"
+    },
+    {
+      "bvid": "BV15KzuBmEHK",
+      "author": "牢A",
+      "title": "新教伦理&活地狱",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "",
+      "transcript": "/transcripts/protestantism.json"
+    },
+    {
+      "bvid": "BV1JDrDB1Ec4",
+      "author": "牢A",
+      "title": "大逃亡&新罗马良家子与贼配军",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "",
+      "transcript": "/transcripts/transcript_clean_2.json"
     }
   ]
 }

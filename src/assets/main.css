@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "@nuxt/ui";
 @import "./base.css";
@@ -25,13 +26,28 @@
 
 .header-controls {
   position: fixed;
-  top: 24px;
+  top: 12px;
   right: 48px;
   z-index: 20;
   display: flex;
   gap: 10px;
   justify-content: flex-end;
-  align-items: center;
+  align-items: flex-end;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.control-label {
+  font-size: 0.55rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: right;
+  margin-bottom: -1px;
 }
 
 .language-switcher {
@@ -66,7 +82,8 @@
     gap: 8px;
   }
 
-  .lang-label {
+  .lang-label,
+  .control-label {
     display: none;
   }
 
@@ -103,10 +120,19 @@
 
 .brand h1,
 .brand-title {
+  font-family: 'Noto Serif SC', serif;
   font-size: clamp(2.2rem, 4vw, 3rem);
   line-height: 1.15;
   cursor: pointer;
   transition: opacity 0.15s ease;
+  color: #383734;
+
+}
+
+.title-author {
+  font-style: italic;
+  color: black;
+  background: linear-gradient(to top, #faeb6a 40%, transparent 40%);
 }
 
 .brand-title:hover {
@@ -149,6 +175,7 @@
 }
 
 .collapsed-title {
+  font-family: 'Noto Serif SC', serif;
   font-size: 1.25rem;
   font-weight: 600;
   white-space: nowrap;

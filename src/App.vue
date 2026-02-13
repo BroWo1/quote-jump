@@ -34,6 +34,7 @@ const selectedStreamer = computed({
   set: (value) => store.setSelectedAuthor(value),
 })
 const appTitle = computed(() => `${store.selectedAuthor || DEFAULT_STREAMER_NAME} ${t('app.name')}`)
+const displayAuthor = computed(() => store.selectedAuthor || DEFAULT_STREAMER_NAME)
 
 watch(
   () => route.query.q,
@@ -106,26 +107,31 @@ onUnmounted(() => {
   <div class="app-shell">
     <header ref="headerRef" class="app-header">
       <div class="header-controls">
-        <USelectMenu
-          v-model="locale"
-          :items="languageOptions"
-          value-key="value"
-          size="md"
-          class="language-select"
-          :ui="{ content: 'z-50' }"
-
-        />
-        <USelectMenu
-          v-model="selectedStreamer"
-          :items="streamerOptions"
-          value-key="value"
-          size="md"
-          class="streamer-select"
-          :ui="{ content: 'z-50' }"
-        />
+        <div class="control-group">
+          <span class="control-label">{{ $t('controls.language') }}</span>
+          <USelectMenu
+            v-model="locale"
+            :items="languageOptions"
+            value-key="value"
+            size="md"
+            class="language-select"
+            :ui="{ content: 'z-50' }"
+          />
+        </div>
+        <div class="control-group">
+          <span class="control-label">{{ $t('controls.streamer') }}</span>
+          <USelectMenu
+            v-model="selectedStreamer"
+            :items="streamerOptions"
+            value-key="value"
+            size="md"
+            class="streamer-select"
+            :ui="{ content: 'z-50' }"
+          />
+        </div>
       </div>
       <div class="brand">
-        <h1 class="brand-title" @click="goHome">{{ appTitle }}</h1>
+        <h1 class="brand-title" @click="goHome"><span class="title-author">{{ displayAuthor }}</span> {{ $t('app.name') }}</h1>
         <p class="subtitle">{{ $t('app.tagline') }}</p>
       </div>
     </header>
@@ -141,7 +147,7 @@ onUnmounted(() => {
     <Transition name="headbar-slide">
       <div v-if="showCollapsedHeadbar" class="search-collapsed">
         <div class="search-collapsed-inner">
-          <h1 class="collapsed-title" @click="goHome">{{ appTitle }}</h1>
+          <h1 class="collapsed-title" @click="goHome"><span class="title-author">{{ displayAuthor }}</span> {{ $t('app.name') }}</h1>
           <SearchBar
             :model-value="draftQuery"
             @update:model-value="draftQuery = $event"

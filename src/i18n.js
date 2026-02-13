@@ -20,7 +20,7 @@ const messages = {
       hits: '{count} hits',
     },
     empty: {
-      noResults: 'No results found. Try a different phrase or wait for indexing to finish.',
+      noResults: 'No results found',
       missingVideo: "We couldn't find this video in the manifest.",
       loadingManifest: 'Loading manifest and transcripts…',
     },
@@ -40,6 +40,10 @@ const messages = {
       coverAlt: '{title} cover',
       embedNote: 'The embed uses the same timestamp as the jump link.',
     },
+    controls: {
+      language: 'Language',
+      streamer: 'Streamer',
+    },
     language: {
       label: 'Language',
       english: 'English',
@@ -49,39 +53,43 @@ const messages = {
   zh: {
     app: {
       name: '言论索引',
-      tagline: '找到精确台词，一键跳到视频上下文。',
+      tagline: '找到精确言论，一键跳到视频上下文。',
     },
     search: {
-      placeholder: '搜索台词、片段和想法…',
+      placeholder: '搜索言论、片段和想法…',
       button: '跳转',
     },
     status: {
       indexing: '正在索引 {loaded} / {total} 条字幕…',
-      ready: '共 {quotes} 条台词，来自 {videos} 个视频',
+      ready: '共 {quotes} 条言论，来自 {videos} 个视频',
       error: '索引不可用——请检查清单或字幕文件。',
       preparing: '正在准备索引…',
       hits: '{count} 条匹配',
     },
     empty: {
-      noResults: '没有找到结果。试试其他词句，或等待索引完成。',
+      noResults: '没有找到结果',
       missingVideo: '清单中找不到该视频。',
       loadingManifest: '正在加载清单和字幕…',
     },
     actions: {
-      loadMore: '加载更多台词',
+      loadMore: '加载更多言论',
       backToResults: '返回结果',
       closeModal: '关闭弹窗',
       openBilibili: '在哔哩哔哩打开',
     },
     transcript: {
       title: '字幕',
-      count: '{count} 条台词',
+      count: '{count} 条言论',
     },
     video: {
       label: '视频跳转',
       playerTitle: '{title} 播放器',
       coverAlt: '{title} 封面',
       embedNote: '嵌入播放器使用与跳转链接相同的时间点。',
+    },
+    controls: {
+      language: '语言',
+      streamer: '主播',
     },
     language: {
       label: '语言',

@@ -28,7 +28,7 @@ const parts = computed(() => splitForHighlight(props.text, props.query))
 }
 
 .hl-hit {
-  background: var(--accent-soft);
+  background: #faeb6a;
   color: var(--ink-strong);
   padding: 0.05em 0.2em;
   border-radius: 6px;
