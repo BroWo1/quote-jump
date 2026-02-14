@@ -147,7 +147,9 @@ onUnmounted(() => {
     <Transition name="headbar-slide">
       <div v-if="showCollapsedHeadbar" class="search-collapsed">
         <div class="search-collapsed-inner">
-          <h1 class="collapsed-title" @click="goHome"><span class="title-author">{{ displayAuthor }}</span> {{ $t('app.name') }}</h1>
+          <button type="button" class="collapsed-logo-button" :aria-label="appTitle" @click="goHome">
+            <img class="collapsed-logo" src="/quoteTrans.png" :alt="appTitle" />
+          </button>
           <SearchBar
             :model-value="draftQuery"
             @update:model-value="draftQuery = $event"

@@ -77,8 +77,12 @@
 
 @media (max-width: 600px) {
   .header-controls {
-    top: 16px;
-    right: 16px;
+    position: static;
+    top: auto;
+    right: auto;
+    width: 100%;
+    justify-content: flex-end;
+    align-items: flex-start;
     gap: 8px;
   }
 
@@ -96,13 +100,10 @@
   }
 
   .search-collapsed-inner {
-    padding: 6px 16px;
-    gap: 12px;
+    padding: 6px 10px 6px 12px;
+    gap: 8px;
   }
 
-  .collapsed-title {
-    display: none;
-  }
 }
 
 .brand {
@@ -155,6 +156,7 @@
 }
 
 .search-collapsed {
+  --collapsed-control-height: 44px;
   position: fixed;
   top: 0;
   left: 0;
@@ -168,23 +170,38 @@
 .search-collapsed-inner {
   max-width: calc(var(--max-width) + 48px);
   margin: 0 auto;
-  padding: 16px 300px 16px 24px;
+  padding: 12px clamp(24px, 18vw, 240px) 12px 24px;
   display: flex;
   align-items: center;
   gap: 16px;
 }
 
-.collapsed-title {
-  font-family: 'Noto Serif SC', serif;
-  font-size: 1.25rem;
-  font-weight: 600;
-  white-space: nowrap;
+.collapsed-logo-button {
+  border: none;
+  background: transparent;
+  padding: 0;
+  height: var(--collapsed-control-height);
+  display: flex;
+  align-items: center;
   cursor: pointer;
   transition: opacity 0.15s ease;
+  flex-shrink: 0;
 }
 
-.collapsed-title:hover {
+.collapsed-logo {
+  display: block;
+  height: 100%;
+  width: auto;
+}
+
+.collapsed-logo-button:hover {
   opacity: 0.7;
+}
+
+.collapsed-logo-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 .search-bar {
@@ -200,10 +217,13 @@
 }
 
 .search-collapsed .search-bar {
-  max-width: 640px;
+  max-width: none;
+  width: auto;
+  min-width: 0;
 }
 
 .search-collapsed .search-input {
+  height: var(--collapsed-control-height);
   padding: 4px 6px 4px 12px;
 }
 

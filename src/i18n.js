@@ -9,7 +9,7 @@ const messages = {
       tagline: 'Find the exact line, then jump straight into the video context.',
     },
     search: {
-      placeholder: 'Search quotes, moments, and ideas…',
+      placeholder: 'Search quotes…',
       button: 'Jump',
     },
     status: {
@@ -56,7 +56,7 @@ const messages = {
       tagline: '找到精确言论，一键跳到视频上下文。',
     },
     search: {
-      placeholder: '搜索言论、片段和想法…',
+      placeholder: '搜索言论…',
       button: '跳转',
     },
     status: {

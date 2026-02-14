@@ -40,7 +40,6 @@ const embedUrl = computed(() => {
         <div class="timestamp-chip">{{ timestamp }}</div>
         <a class="primary-button" :href="bilibiliUrl" target="_blank" rel="noopener">{{ $t('actions.openBilibili') }}</a>
       </div>
-      <p class="helper-text">{{ $t('video.embedNote') }}</p>
     </div>
   </section>
 </template>
