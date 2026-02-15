@@ -21,6 +21,13 @@ const languageOptions = [
   { value: 'en', label: 'English' },
   { value: 'zh', label: '中文' },
 ]
+const footerLinks = [
+  { label: 'GitHub', href: 'https://github.com/BroWo1', target: '_blank', rel: 'noopener noreferrer' },
+  { label: 'itLooksLegit', href: 'https://www.itlookslegit.com', target: '_blank', rel: 'noopener noreferrer' },
+  { label: 'Card Catalog', href: 'https://github.com/BroWo1/CardCatalog', target: '_blank', rel: 'noopener noreferrer' },
+
+]
+const footerYear = new Date().getFullYear()
 
 const isDetail = computed(() => route.path.startsWith('/v/'))
 const streamerOptions = computed(() =>
@@ -164,8 +171,21 @@ onUnmounted(() => {
       <QuoteDetail v-else />
     </main>
 
-    <footer class="app-footer">
-      <span v-if="store.errors.length">{{ store.errors[store.errors.length - 1] }}</span>
-    </footer>
+    <UFooter class="app-footer">
+      <template #left>
+        <span class="footer-copy">© {{ footerYear }} GPE Club</span>
+      </template>
+
+      <UNavigationMenu
+        class="app-footer-nav"
+        :items="footerLinks"
+        orientation="horizontal"
+      />
+
+      <template #right>
+        <span v-if="store.errors.length" class="footer-status">{{ store.errors[store.errors.length - 1] }}</span>
+      </template>
+    </UFooter>
+    
   </div>
 </template>

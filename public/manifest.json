@@ -23,6 +23,22 @@
       "coverUrl": "/covers/cover-01.svg",
       "date": "",
       "transcript": "/transcripts/transcript_clean_2.json"
+    },
+    {
+      "bvid": "BV1naiRB2EfP",
+      "author": "牢A",
+      "title": "狠活小诊所&家庭医生",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "",
+      "transcript": "/transcripts/doctor.json"
+    },
+    {
+      "bvid": "BV1GGipBgEAB",
+      "author": "牢A",
+      "title": "朝圣狂信徒&隔离区",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "",
+      "transcript": "/transcripts/other.json"
     }
   ]
 }

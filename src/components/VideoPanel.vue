@@ -21,9 +21,12 @@ const embedUrl = computed(() => {
 
 <template>
   <section class="video-panel">
-    <header>
-      <p class="panel-label">{{ $t('video.label') }}</p>
-      <h2>{{ video.title }}</h2>
+    <header class="video-header">
+      <img class="video-header-logo" src="/quoteTrans.png" alt="quoteTrans logo" />
+      <div class="video-header-copy">
+        <p class="panel-label">{{ $t('video.label') }}</p>
+        <h2>{{ video.title }}</h2>
+      </div>
     </header>
     <div class="video-shell">
       <div class="embed-frame">
