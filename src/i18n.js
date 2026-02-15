@@ -6,7 +6,7 @@ const messages = {
   en: {
     app: {
       name: 'Quote Jump',
-      tagline: 'Find the exact line, then jump straight into the video context.',
+      tagline: 'A Live Stream AI Transcript Search Engine',
     },
     search: {
       placeholder: 'Search quotes…',
@@ -53,10 +53,10 @@ const messages = {
   zh: {
     app: {
       name: '言论索引',
-      tagline: '找到精确言论，一键跳到视频上下文。',
+      tagline: '一个直播AI字幕搜索引擎',
     },
     search: {
-      placeholder: '搜索言论…',
+      placeholder: '搜索字幕…',
       button: '跳转',
     },
     status: {
@@ -72,14 +72,14 @@ const messages = {
       loadingManifest: '正在加载清单和字幕…',
     },
     actions: {
-      loadMore: '加载更多言论',
+      loadMore: '加载更多字幕',
       backToResults: '返回结果',
       closeModal: '关闭弹窗',
       openBilibili: '在哔哩哔哩打开',
     },
     transcript: {
       title: '字幕',
-      count: '{count} 条言论',
+      count: '{count} 条字幕',
     },
     video: {
       label: '视频跳转',
