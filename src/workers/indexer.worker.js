@@ -5,6 +5,10 @@ const B = 0.75
 const EMBEDDING_DIM = 128
 const SEMANTIC_MIN_SCORE = 0.12
 const RERANK_TOP_K = 120
+const INDEX_CACHE_DB = 'quote-jump-cache'
+const INDEX_CACHE_STORE = 'search-index'
+const INDEX_CACHE_DB_VERSION = 1
+const INDEX_SCHEMA_VERSION = 1
 
 const FIELD_WEIGHTS = {
   quote: 3.6,
@@ -19,6 +23,7 @@ const state = {
   pending: new Set(),
   ready: false,
   buildToken: 0,
+  cacheKey: '',
   rankModel: {
     idf: new Map(),
     avgFieldLength: {
@@ -108,6 +113,196 @@ function hashString(input) {
     hash += (hash << 1) + (hash << 4) + (hash << 7) + (hash << 8) + (hash << 24)
   }
   return hash >>> 0
+}
+
+function toMap(value) {
+  if (value instanceof Map) return value
+  if (Array.isArray(value)) return new Map(value)
+  if (value && typeof value === 'object') return new Map(Object.entries(value))
+  return new Map()
+}
+
+function toSet(value) {
+  if (value instanceof Set) return value
+  if (Array.isArray(value)) return new Set(value)
+  return new Set()
+}
+
+function toFloat32Array(value) {
+  if (value instanceof Float32Array) return value
+  if (Array.isArray(value)) return Float32Array.from(value)
+  if (ArrayBuffer.isView(value)) return new Float32Array(value)
+  return new Float32Array(EMBEDDING_DIM)
+}
+
+function waitForRequest(request) {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result)
+    request.onerror = () => reject(request.error || new Error('IndexedDB request failed'))
+  })
+}
+
+function waitForTransaction(transaction) {
+  return new Promise((resolve, reject) => {
+    transaction.oncomplete = () => resolve()
+    transaction.onabort = () => reject(transaction.error || new Error('IndexedDB transaction aborted'))
+    transaction.onerror = () => reject(transaction.error || new Error('IndexedDB transaction failed'))
+  })
+}
+
+function openCacheDb() {
+  if (typeof indexedDB === 'undefined') return Promise.resolve(null)
+
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(INDEX_CACHE_DB, INDEX_CACHE_DB_VERSION)
+
+    request.onupgradeneeded = () => {
+      const db = request.result
+      if (!db.objectStoreNames.contains(INDEX_CACHE_STORE)) {
+        db.createObjectStore(INDEX_CACHE_STORE)
+      }
+    }
+
+    request.onsuccess = () => resolve(request.result)
+    request.onerror = () => reject(request.error || new Error('Failed to open index cache'))
+  })
+}
+
+async function readCachedIndex(cacheKey) {
+  if (!cacheKey) return null
+  let db
+  try {
+    db = await openCacheDb()
+    if (!db) return null
+
+    const tx = db.transaction(INDEX_CACHE_STORE, 'readonly')
+    const store = tx.objectStore(INDEX_CACHE_STORE)
+    const record = await waitForRequest(store.get(cacheKey))
+    await waitForTransaction(tx)
+    return record || null
+  } catch {
+    return null
+  } finally {
+    if (db) db.close()
+  }
+}
+
+async function writeCachedIndex(cacheKey, payload) {
+  if (!cacheKey || !payload) return
+  let db
+  try {
+    db = await openCacheDb()
+    if (!db) return
+
+    const tx = db.transaction(INDEX_CACHE_STORE, 'readwrite')
+    tx.objectStore(INDEX_CACHE_STORE).put(payload, cacheKey)
+    await waitForTransaction(tx)
+  } catch {
+    // Cache write failures are non-fatal.
+  } finally {
+    if (db) db.close()
+  }
+}
+
+function createManifestCacheKey(manifest) {
+  const signature = manifest.map((video) => ({
+    bvid: String(video.bvid || ''),
+    author: String(video.author || ''),
+    title: String(video.title || ''),
+    date: String(video.date || ''),
+    transcript: String(video.transcript || ''),
+    coverUrl: String(video.coverUrl || ''),
+  }))
+
+  return `v${INDEX_SCHEMA_VERSION}:${manifest.length}:${hashString(JSON.stringify(signature))}`
+}
+
+function serializeIndexEntry(entry) {
+  return {
+    ...entry,
+    _search: {
+      ...entry._search,
+      quoteTf: Array.from(entry._search.quoteTf.entries()),
+      titleTf: Array.from(entry._search.titleTf.entries()),
+      contextTf: Array.from(entry._search.contextTf.entries()),
+      uniqueTokens: Array.from(entry._search.uniqueTokens.values()),
+    },
+  }
+}
+
+function reviveIndexEntry(entry) {
+  if (!entry || !entry._search) return null
+
+  return {
+    ...entry,
+    _search: {
+      ...entry._search,
+      quoteTf: toMap(entry._search.quoteTf),
+      titleTf: toMap(entry._search.titleTf),
+      contextTf: toMap(entry._search.contextTf),
+      uniqueTokens: toSet(entry._search.uniqueTokens),
+      semanticVector: toFloat32Array(entry._search.semanticVector),
+    },
+  }
+}
+
+function serializeRankModel(rankModel) {
+  return {
+    idf: Array.from(rankModel.idf.entries()),
+    totalDocs: rankModel.totalDocs,
+    avgFieldLength: rankModel.avgFieldLength,
+  }
+}
+
+function reviveRankModel(rankModel) {
+  return {
+    idf: toMap(rankModel?.idf),
+    totalDocs: Number(rankModel?.totalDocs || 0),
+    avgFieldLength: {
+      quote: Number(rankModel?.avgFieldLength?.quote || 1),
+      title: Number(rankModel?.avgFieldLength?.title || 1),
+      context: Number(rankModel?.avgFieldLength?.context || 1),
+    },
+  }
+}
+
+function createCachePayload(cacheKey) {
+  return {
+    schemaVersion: INDEX_SCHEMA_VERSION,
+    savedAt: Date.now(),
+    totalVideos: state.manifest.length,
+    totalQuotes: state.index.length,
+    index: state.index.map(serializeIndexEntry),
+    byBvidEntries: Array.from(state.byBvid.entries()),
+    rankModel: serializeRankModel(state.rankModel),
+    cacheKey,
+  }
+}
+
+async function persistCurrentIndex(cacheKey) {
+  if (!cacheKey) return
+  const payload = createCachePayload(cacheKey)
+  await writeCachedIndex(cacheKey, payload)
+}
+
+async function restoreCachedIndex(cacheKey) {
+  const cached = await readCachedIndex(cacheKey)
+  if (!cached || cached.schemaVersion !== INDEX_SCHEMA_VERSION) return false
+  if (!Array.isArray(cached.index)) return false
+
+  const restoredIndex = cached.index.map(reviveIndexEntry).filter(Boolean)
+  const restoredByBvid = new Map()
+  if (Array.isArray(cached.byBvidEntries)) {
+    for (const [bvid, quotes] of cached.byBvidEntries) {
+      restoredByBvid.set(bvid, Array.isArray(quotes) ? quotes : [])
+    }
+  }
+
+  state.index = restoredIndex
+  state.byBvid = restoredByBvid
+  state.rankModel = reviveRankModel(cached.rankModel)
+  state.ready = true
+  return true
 }
 
 function normalizeVector(vector) {
@@ -361,7 +556,7 @@ async function loadTranscript(video) {
   }
 }
 
-async function buildIndex(buildToken) {
+async function buildIndex(buildToken, cacheKey = state.cacheKey) {
   state.index = []
   state.byBvid.clear()
 
@@ -415,6 +610,68 @@ async function buildIndex(buildToken) {
     totalVideos: total,
     totalQuotes: state.index.length,
   })
+
+  void persistCurrentIndex(cacheKey)
+}
+
+async function restoreOrBuildIndex(buildToken) {
+  const cacheKey = createManifestCacheKey(state.manifest)
+  state.cacheKey = cacheKey
+
+  const restored = await restoreCachedIndex(cacheKey)
+  if (buildToken !== state.buildToken) return
+
+  if (restored) {
+    const total = state.manifest.length
+    self.postMessage({
+      type: 'progress',
+      loaded: total,
+      total,
+      cached: true,
+    })
+    self.postMessage({
+      type: 'ready',
+      totalVideos: total,
+      totalQuotes: state.index.length,
+      cached: true,
+    })
+    return
+  }
+
+  await buildIndex(buildToken, cacheKey)
+}
+
+function findVideoByBvid(bvid) {
+  return state.manifest.find((video) => video.bvid === bvid) || null
+}
+
+async function loadPendingTranscript(bvid, buildToken) {
+  const video = findVideoByBvid(bvid)
+  if (!video) {
+    state.pending.delete(bvid)
+    self.postMessage({
+      type: 'transcript',
+      bvid,
+      quotes: [],
+    })
+    return
+  }
+
+  const quotes = await loadTranscript(video)
+  if (buildToken !== state.buildToken) return
+
+  if (state.pending.has(bvid)) {
+    state.pending.delete(bvid)
+    self.postMessage({
+      type: 'transcript',
+      bvid,
+      quotes,
+    })
+  }
+
+  if (state.cacheKey) {
+    void persistCurrentIndex(state.cacheKey)
+  }
 }
 
 function searchIndex(query) {
@@ -545,7 +802,7 @@ self.onmessage = (event) => {
     state.ready = false
     state.pending.clear()
     state.buildToken += 1
-    buildIndex(state.buildToken)
+    restoreOrBuildIndex(state.buildToken)
     return
   }
 
@@ -568,7 +825,11 @@ self.onmessage = (event) => {
         quotes,
       })
     } else {
+      const alreadyPending = state.pending.has(message.bvid)
       state.pending.add(message.bvid)
+      if (state.ready && !alreadyPending) {
+        void loadPendingTranscript(message.bvid, state.buildToken)
+      }
     }
   }
 }
