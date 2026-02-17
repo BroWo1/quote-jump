@@ -8,12 +8,11 @@ const RERANK_TOP_K = 120
 const INDEX_CACHE_DB = 'quote-jump-cache'
 const INDEX_CACHE_STORE = 'search-index'
 const INDEX_CACHE_DB_VERSION = 1
-const INDEX_SCHEMA_VERSION = 1
+const INDEX_SCHEMA_VERSION = 2
 
 const FIELD_WEIGHTS = {
   quote: 3.6,
   title: 2.1,
-  context: 1.0,
 }
 
 const state = {
@@ -29,7 +28,6 @@ const state = {
     avgFieldLength: {
       quote: 1,
       title: 1,
-      context: 1,
     },
     totalDocs: 0,
   },
@@ -120,12 +118,6 @@ function toMap(value) {
   if (Array.isArray(value)) return new Map(value)
   if (value && typeof value === 'object') return new Map(Object.entries(value))
   return new Map()
-}
-
-function toSet(value) {
-  if (value instanceof Set) return value
-  if (Array.isArray(value)) return new Set(value)
-  return new Set()
 }
 
 function toFloat32Array(value) {
@@ -224,8 +216,6 @@ function serializeIndexEntry(entry) {
       ...entry._search,
       quoteTf: Array.from(entry._search.quoteTf.entries()),
       titleTf: Array.from(entry._search.titleTf.entries()),
-      contextTf: Array.from(entry._search.contextTf.entries()),
-      uniqueTokens: Array.from(entry._search.uniqueTokens.values()),
     },
   }
 }
@@ -239,8 +229,6 @@ function reviveIndexEntry(entry) {
       ...entry._search,
       quoteTf: toMap(entry._search.quoteTf),
       titleTf: toMap(entry._search.titleTf),
-      contextTf: toMap(entry._search.contextTf),
-      uniqueTokens: toSet(entry._search.uniqueTokens),
       semanticVector: toFloat32Array(entry._search.semanticVector),
     },
   }
@@ -261,7 +249,6 @@ function reviveRankModel(rankModel) {
     avgFieldLength: {
       quote: Number(rankModel?.avgFieldLength?.quote || 1),
       title: Number(rankModel?.avgFieldLength?.title || 1),
-      context: Number(rankModel?.avgFieldLength?.context || 1),
     },
   }
 }
@@ -378,14 +365,11 @@ function updateDocumentFrequency(map, tokenSet) {
 function buildIndexEntry(video, quote) {
   const quoteNormalized = normalizeText(quote.text)
   const titleNormalized = normalizeText(video.title)
-  const contextText = `${quote.prevText || ''} ${quote.nextText || ''}`
-  const contextNormalized = normalizeText(contextText)
 
   const quoteTokens = tokenizeForSearch(quoteNormalized)
   const titleTokens = tokenizeForSearch(titleNormalized)
-  const contextTokens = tokenizeForSearch(contextNormalized)
 
-  const searchableText = `${quoteNormalized} ${titleNormalized} ${contextNormalized}`.trim()
+  const searchableText = `${quoteNormalized} ${titleNormalized}`.trim()
 
   return {
     bvid: video.bvid,
@@ -402,21 +386,16 @@ function buildIndexEntry(video, quote) {
     _search: {
       quoteNormalized,
       titleNormalized,
-      contextNormalized,
       quoteCompact: compactText(quoteNormalized),
       titleCompact: compactText(titleNormalized),
-      contextCompact: compactText(contextNormalized),
       quoteTf: toTermFrequency(quoteTokens),
       titleTf: toTermFrequency(titleTokens),
-      contextTf: toTermFrequency(contextTokens),
       quoteLength: quoteTokens.length,
       titleLength: titleTokens.length,
-      contextLength: contextTokens.length,
-      uniqueTokens: new Set([...quoteTokens, ...titleTokens, ...contextTokens]),
+      uniqueTokens: new Set([...quoteTokens, ...titleTokens]),
       semanticVector: weightedVector([
         { text: quoteNormalized, weight: 1.0 },
         { text: titleNormalized, weight: 0.65 },
-        { text: contextNormalized, weight: 0.35 },
       ]),
     },
   }
@@ -436,7 +415,6 @@ function computeRankModel(index, docFrequency, fieldLengthSums) {
     avgFieldLength: {
       quote: totalDocs ? fieldLengthSums.quote / totalDocs : 1,
       title: totalDocs ? fieldLengthSums.title / totalDocs : 1,
-      context: totalDocs ? fieldLengthSums.context / totalDocs : 1,
     },
   }
 }
@@ -456,7 +434,6 @@ function computeLexicalScore(entry, queryTokens) {
     matchedTokenCount: 0,
     quoteTokenMatches: 0,
     titleTokenMatches: 0,
-    contextTokenMatches: 0,
     tokenCoverage: 0,
     allTokensInQuote: false,
     phraseInQuote: false,
@@ -472,14 +449,12 @@ function computeLexicalScore(entry, queryTokens) {
 
     const quoteTf = entry._search.quoteTf.get(token) || 0
     const titleTf = entry._search.titleTf.get(token) || 0
-    const contextTf = entry._search.contextTf.get(token) || 0
-    const tokenMatched = quoteTf > 0 || titleTf > 0 || contextTf > 0
+    const tokenMatched = quoteTf > 0 || titleTf > 0
     if (!tokenMatched) continue
     matchedTokens.push(token)
 
     if (quoteTf > 0) details.quoteTokenMatches += 1
     if (titleTf > 0) details.titleTokenMatches += 1
-    if (contextTf > 0) details.contextTokenMatches += 1
 
     details.rawScore += FIELD_WEIGHTS.quote * bm25(
       quoteTf,
@@ -492,12 +467,6 @@ function computeLexicalScore(entry, queryTokens) {
       idf,
       entry._search.titleLength,
       state.rankModel.avgFieldLength.title
-    )
-    details.rawScore += FIELD_WEIGHTS.context * bm25(
-      contextTf,
-      idf,
-      entry._search.contextLength,
-      state.rankModel.avgFieldLength.context
     )
   }
 
@@ -527,10 +496,6 @@ function computeRerankBonus(candidate, queryMeta) {
     const span = Math.max(...quotePositions) - Math.min(...quotePositions)
     const compactSpan = Math.max(1, queryMeta.compact.length || queryMeta.original.length || 1)
     bonus += Math.max(0, 0.12 - span / (compactSpan * 200))
-  }
-
-  if (!lexical.quoteTokenMatches && lexical.contextTokenMatches) {
-    bonus -= 0.06
   }
 
   return bonus
@@ -564,7 +529,6 @@ async function buildIndex(buildToken, cacheKey = state.cacheKey) {
   const fieldLengthSums = {
     quote: 0,
     title: 0,
-    context: 0,
   }
 
   const total = state.manifest.length
@@ -581,7 +545,6 @@ async function buildIndex(buildToken, cacheKey = state.cacheKey) {
       updateDocumentFrequency(docFrequency, entry._search.uniqueTokens)
       fieldLengthSums.quote += entry._search.quoteLength
       fieldLengthSums.title += entry._search.titleLength
-      fieldLengthSums.context += entry._search.contextLength
     }
 
     if (state.pending.has(video.bvid)) {
@@ -698,8 +661,7 @@ function searchIndex(query) {
     const hasSemanticSignal = semantic >= SEMANTIC_MIN_SCORE
     const hasCompactSignal = queryCompact
       ? entry._search.quoteCompact.includes(queryCompact) ||
-        entry._search.titleCompact.includes(queryCompact) ||
-        entry._search.contextCompact.includes(queryCompact)
+        entry._search.titleCompact.includes(queryCompact)
       : false
 
     if (!hasLexicalSignal && !hasSemanticSignal && !hasCompactSignal) continue
@@ -708,7 +670,7 @@ function searchIndex(query) {
       ? 'quote'
       : lexical.titleTokenMatches
         ? 'title'
-        : 'context'
+        : 'quote'
 
     candidates.push({
       entry,
@@ -756,7 +718,6 @@ function searchIndex(query) {
   const classPriority = {
     quote: 0,
     title: 1,
-    context: 2,
   }
 
   candidates.sort((a, b) => {
@@ -789,7 +750,6 @@ function searchIndex(query) {
     tokenCoverage: candidate.lexical.tokenCoverage,
     matchedTokenCount: candidate.lexical.matchedTokenCount,
     quoteHits: candidate.lexical.quoteTokenMatches,
-    contextHits: candidate.lexical.contextTokenMatches,
   }))
 }
 

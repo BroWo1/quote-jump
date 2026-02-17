@@ -39,6 +39,14 @@
       "coverUrl": "/covers/cover-01.svg",
       "date": "",
       "transcript": "/transcripts/other.json"
+    },
+      {
+      "bvid": "BV1SbBnBqEHc",
+      "author": "牢A",
+      "title": "天堂地狱分割线",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "",
+      "transcript": "/transcripts/hell.json"
     }
   ]
 }
