@@ -40,13 +40,37 @@
       "date": "",
       "transcript": "/transcripts/other.json"
     },
-      {
+    {
       "bvid": "BV1SbBnBqEHc",
       "author": "牢A",
       "title": "天堂地狱分割线",
       "coverUrl": "/covers/cover-01.svg",
       "date": "",
       "transcript": "/transcripts/hell.json"
+    },
+    {
+      "bvid": "BV1cRv4BPENG",
+      "author": "牢A",
+      "title": "医学进步&小白鼠",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "",
+      "transcript": "/transcripts/jerry.json"
+    },
+    {
+      "bvid": "BV1sFihBnEHa",
+      "author": "牢A",
+      "title": "家人侠与门当户对&抵抗斩杀线",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "",
+      "transcript": "/transcripts/man.json"
+    },
+    {
+      "bvid": "BV1xxFtzuEaf",
+      "author": "牢A",
+      "title": "甜蜜陷阱1",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "",
+      "transcript": "/transcripts/sugarold.json"
     }
   ]
 }

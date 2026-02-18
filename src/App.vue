@@ -75,7 +75,10 @@ watch(
 )
 
 const submitSearch = (value) => {
-  if (!value) return
+  if (!value) {
+    goHome()
+    return
+  }
   navigate('/search', { q: value })
 }
 
