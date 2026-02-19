@@ -45,7 +45,7 @@ onMounted(async () => {
       <span class="timestamp">{{ timestamp }}</span>
     </div>
     <div class="quote-body">
-      <h3>{{ hit.title }}</h3>
+      <h3><b>{{ hit.title }}</b> <span v-if="hit.date" class="quote-date">{{ hit.date }}</span></h3>
       <p class="quote-text">
         <Highlighter :text="hit.quoteText" :query="query" />
       </p>

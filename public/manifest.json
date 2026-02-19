@@ -1,51 +1,19 @@
 {
   "videos": [
     {
-      "bvid": "BV1CRkhBNExs",
+      "bvid": "BV1v6mwBSEBH",
       "author": "牢A",
-      "title": "和大佬连麦",
+      "title": "钝刀子割肉&斩杀线",
       "coverUrl": "/covers/cover-01.svg",
-      "date": "",
-      "transcript": "/transcripts/transcript_test.json"
-    },
-    {
-      "bvid": "BV15KzuBmEHK",
-      "author": "牢A",
-      "title": "新教伦理&活地狱",
-      "coverUrl": "/covers/cover-01.svg",
-      "date": "",
-      "transcript": "/transcripts/protestantism.json"
-    },
-    {
-      "bvid": "BV1JDrDB1Ec4",
-      "author": "牢A",
-      "title": "大逃亡&新罗马良家子与贼配军",
-      "coverUrl": "/covers/cover-01.svg",
-      "date": "",
-      "transcript": "/transcripts/transcript_clean_2.json"
-    },
-    {
-      "bvid": "BV1naiRB2EfP",
-      "author": "牢A",
-      "title": "狠活小诊所&家庭医生",
-      "coverUrl": "/covers/cover-01.svg",
-      "date": "",
-      "transcript": "/transcripts/doctor.json"
-    },
-    {
-      "bvid": "BV1GGipBgEAB",
-      "author": "牢A",
-      "title": "朝圣狂信徒&隔离区",
-      "coverUrl": "/covers/cover-01.svg",
-      "date": "",
-      "transcript": "/transcripts/other.json"
+      "date": "2025.12.8",
+      "transcript": "/transcripts/original.json"
     },
     {
       "bvid": "BV1SbBnBqEHc",
       "author": "牢A",
       "title": "天堂地狱分割线",
       "coverUrl": "/covers/cover-01.svg",
-      "date": "",
+      "date": "2025.12.22",
       "transcript": "/transcripts/hell.json"
     },
     {
@@ -53,7 +21,7 @@
       "author": "牢A",
       "title": "医学进步&小白鼠",
       "coverUrl": "/covers/cover-01.svg",
-      "date": "",
+      "date": "2025.12.30",
       "transcript": "/transcripts/jerry.json"
     },
     {
@@ -61,15 +29,55 @@
       "author": "牢A",
       "title": "家人侠与门当户对&抵抗斩杀线",
       "coverUrl": "/covers/cover-01.svg",
-      "date": "",
+      "date": "2026.1.3",
       "transcript": "/transcripts/man.json"
+    },
+    {
+      "bvid": "BV1GGipBgEAB",
+      "author": "牢A",
+      "title": "朝圣狂信徒&隔离区",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "2026.1.5",
+      "transcript": "/transcripts/other.json"
+    },
+    {
+      "bvid": "BV1naiRB2EfP",
+      "author": "牢A",
+      "title": "狠活小诊所&家庭医生",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "2026.1.9",
+      "transcript": "/transcripts/doctor.json"
+    },
+    {
+      "bvid": "BV1JDrDB1Ec4",
+      "author": "牢A",
+      "title": "大逃亡&新罗马良家子与贼配军",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "2026.1.18",
+      "transcript": "/transcripts/transcript_clean_2.json"
+    },
+    {
+      "bvid": "BV1CRkhBNExs",
+      "author": "牢A",
+      "title": "和大佬连麦",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "2026.1.19",
+      "transcript": "/transcripts/transcript_test.json"
+    },
+    {
+      "bvid": "BV15KzuBmEHK",
+      "author": "牢A",
+      "title": "新教伦理&活地狱",
+      "coverUrl": "/covers/cover-01.svg",
+      "date": "2026.1.24",
+      "transcript": "/transcripts/protestantism.json"
     },
     {
       "bvid": "BV1xxFtzuEaf",
       "author": "牢A",
       "title": "甜蜜陷阱1",
       "coverUrl": "/covers/cover-01.svg",
-      "date": "",
+      "date": "2026.2.8",
       "transcript": "/transcripts/sugarold.json"
     }
   ]

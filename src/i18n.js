@@ -29,6 +29,7 @@ const messages = {
       backToResults: 'Back to results',
       closeModal: 'Close modal',
       openBilibili: 'Open on Bilibili',
+      downloadTranscript: 'Download transcript',
     },
     transcript: {
       title: 'Transcript',
@@ -76,6 +77,7 @@ const messages = {
       backToResults: '返回结果',
       closeModal: '关闭弹窗',
       openBilibili: '在哔哩哔哩打开',
+      downloadTranscript: '下载字幕',
     },
     transcript: {
       title: '字幕',

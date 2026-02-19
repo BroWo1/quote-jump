@@ -73,7 +73,7 @@ const goBack = () => {
       <p>{{ t('empty.missingVideo') }}</p>
     </div>
     <div v-else class="detail-grid">
-      <VideoPanel :video="video" :start-time="startTime" />
+      <VideoPanel :video="video" :start-time="startTime" :quotes="quotes" />
       <TranscriptPanel
         :quotes="quotes"
         :active-quote-id="activeQuote?.id"
